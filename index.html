@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ECA rule 110 glider collision</title>
+	
+<script type="text/javascript">
+function init() {
+  const DELAY = 10 // millisecs
+  const canvas = document.createElement('canvas')
+  canvas.width = 516 // should be cell_width * num_cells
+  canvas.height = 600; // should be multiple of cell_width
+  const body = document.getElementsByTagName("body")[0]
+  body.appendChild(canvas)
+  const context = canvas.getContext('2d')
+  context.clearRect(0, 0, canvas.width, canvas.height)
+
+  const cell_width =  4
+  const num_cells = canvas.width / cell_width // == 129 when canvas.width == 516 and cell_width == 4
+  const num_rows = canvas.height / cell_width
+  const rule_110 = [0,1,1,1,0,1,1,0] // rule 110 backwards, LSB first
+  const new_cells = []
+
+  // initialize automaton, length of cells[] should be num_cells
+  let cells = [1,1,0,1,1,1,1,1,0,0,0,1,0,0, 1,1,0,1,1,1,0,1,0,0, 1,1,0,1,1,1,1,1,0,0,0,1,0,0, 1,1,0,1,1,1,1,1,0,0,0,1,0,0, 1,1,0,1,1,1,1,1,0,0,0,1,0,0, 1,1,0,1,1,1,1,1,0,0,0,1,0,0, 1,1,0,1,1,1,1,1,0,0,0,1,0,0,  0,1,1,1,1,1,0,1,1,0,1,1,1,1,1,0,0,0,1,0,0, 1,1,0,1,1,1,1,1,0,0,0,1,0,0 ]
+
+  function to_int(l, c, r) { return l * 4 + c * 2 + r }
+
+  let row = 0
+  setTimeout(draw_row, DELAY)
+
+  function draw_row() {
+    for (let j = 0; j < num_cells; j++) {
+      context.fillStyle = cells[j] ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)' 
+      context.fillRect(j * cell_width, row * cell_width, cell_width, cell_width)
+      new_cells[j] = rule_110[to_int(j === 0 ? cells[num_cells - 1] : cells[j - 1], cells[j], j === num_cells - 1 ? cells[0] : cells[j + 1])]
+    }
+    cells = new_cells.slice()
+    if(row++ < num_rows) setTimeout(draw_row, DELAY)
+  }
+}	
+</script>
+
+<body onload="init()">
+</body>
+</html>
